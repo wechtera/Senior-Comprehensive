@@ -1,0 +1,54 @@
+%
+% $Id: ch01_overview
+%
+%   *******************************************************************
+%   * SEE THE MAIN FILE "AllegThesis.tex" FOR MORE INFORMATION.       *
+%   *******************************************************************
+
+\chapter{Introduction}\label{ch:intro} % we can refer to chapter by the label
+
+%   ************************************************************************
+%   * In LaTeX, new paragraphs are begun by simply leaving a blank line in *
+%   * the LaTeX file.                                                      *
+%   *                                                                      *
+%   * The \\ characters should NEVER be used to end a paragraph.           *
+%   * They are used only for inserting line breaks in certain situations.  *
+%   *                                                                      *
+%   * "Widows" (ending paragraph lines at the top of a new page) and       *
+%   * "orphans" (opening paragraph lines at the bottom of a page) should   *
+%   * be eliminated; this sometimes requires re-writing some of the        *
+%   * text to change the line lengths.                                     *
+%   ************************************************************************
+
+This chapter will overview the entirety of the project including motivation for research, thesis statement, goals of the project, contributions of this project, and finally a general outline to the format and construction of this paper.  Primary and secondary sources are reserved for chapter \ref{ch:relatedwork} and will not be found in this section.  Also, this segment will begin to introduce some of the language and definitions that the reader will find necessary to understand the entirety of this paper, however rarely used terms will be defined within their respective section if they are not commonly used.  
+
+
+\section{Motivation} \label{sec:motivation}
+%Talk about problems related to traffic
+% multi objective function
+%how many cars per road
+
+Traffic gridlock and delay waste precious natural, financial, and time resources, while contributing to local air pollution and global greenhouse gas accumulation.  It is well established that this problem is worsening is well-established.  Improved mass transit, increasingly fuel- efficient vehicles, and flexible work hours all have their places in addressing traffic gridlock and delay.  Approaches to traffic intersection control itself are also being created, tested, evaluated, and implemented as potentially promising large-scale palliative solutions.  The successful use of genetic algorithms in providing more optimal solutions to such problems as time tabling, scheduling, and other NP-Hard problems, and to some extent to the problems of traffic flow, supports expanding their use to further ameliorate traffic congestion.  Traffic intersection control and genetic algorithms (GAs) are two subjects of deep personal interest to the author, and the notion of combining those interests to address a major problem motivates this research.  
+
+Of all the means of limiting the sequelae of traffic congestion, the most feasible and affordable in the short run is implementing traffic pattern changes through intersection control, using a system that minimizes investment in hardware and related equipment and their installation. Proposed systems that rely on universally installed internal automobile technology fail those criterion mentioned. Similarly, for reasons of cost alone, the ideal of restructuring an entire urban system and thus physically optimizing or overhauling the existing system is an essentially impossible one for existing cities.
+ 
+Genetic algorithms (GA) are search heuristics which emulate natural selection and evolution to generate solutions to optimization or search problems; they are part of a larger collection of algorithms called evolutionary algorithms (EAs).  Fundamental to these algorithms is their uses of genetic representations to describe solution domains, in this case  binary arrays, as well as fitness functions that assign  numeric representations to the quality of the performance of solution domains.  Motivations for choosing this sort of algorithm for the process of optimizing traffic intersection configurations are threefold:  first of all, GAs have been successfully implemented in the past for two specific types of problems with great success, namely time-tabling and scheduling.  Both of these problems are known to be NP-Hard, which indicates that there are no known algorithms to effectively find  solutions in polynomial time.  Since traffic system optimization problems fall under similar constraints, genetic algorithms would seem to be a choice method for generating possible optimized configuration networks for traffic control.  Secondly, the success of several other projects involving implementation of genetic algorithms encourages further exploration and study.  Lastly, although many systems, such as the Sydney Coordinated Adaptive Traffic System (SCATS), work very well in real time, their development relies on initial layouts and timing configurations as standard starting points; determining those is already an expensive and time-consuming process.  Using GA-determined configurations to establish the standard starting points may reduce the time and costs involved  and thus encourage  more widespread use of these expensive  but proven systems.
+
+\section{Thesis Statement}\label{sec:thesis}
+
+Using a discrete event simulator as a testing and metric environment, it will be demonstrated that genetic algorithms are able to improve several benchmarking criteria, including decreasing time transit and time delay, while operating within the constraints of a realistic traffic experience. 
+
+\section{Goals of the Project}\label{sec:goals}
+
+This project has several goals primarily involving the creation of different components of the simulator and ECJ engine, followed by a series of objectives normally associated with empirical research.  By running custom or randomly generated grid designs and gathering critical data, the simulator will enable determination of the fitness of the current traffic network setup, as well as gathering information about vital information for comparison with a previous iteration.  Developing the simulator was the primary focus of this comprehensive project as subsequent phases depended on its functioning.
+
+The next deliverable of this project involves the implementation and customization of the Java Evolutionary Computational genetic algorithm (ECJ).  ECJ is a dynamic, open source, freeware algorithm, which has been proven to efficiently and effectively solve stochastic optimization problems, more specifically ones involving metaheuristics.  Stochastic optimization is a class of techniques that use randomness to a degree in order to find the closest to optimal, and sometimes optimal, solution to NP-Hard problems.  Metaheuristics are strategies used to guide a search process using heuristics to find a good enough solution to some sort of problem.  Since metaheuristics are not problem specific, this project utilizes the framework provided by ECJ, along with the highly documented instruction manual to develop the algorithm described later in chapter \ref{ch:method}\cite{GAMANUAL}\cite{otherBook}. 
+
+Only after the completion of these major components can the final objective of this project be attempted:  to execute the program in a series of tests and analyze the results from different scenarios.  The downside to GAs is that ``better" solutions are only in the realm of other solutions.  This being said, GAs are generally compared to different optimization algorithms for analysis, such as a completely random solution-generating algorithm that essentially brute forces a solution, saving the best found every iteration.  By comparing how the GA performs to some other algorithm, the reader will be able to easily judge its performance as a traffic control configuration optimizer.    
+
+\section{Contributions}\label{sec:contributions}
+The contributions of this senior comprehensive project include several promising new advancements to traffic systems optimizations.  Firstly, this paper will demonstrate through its results that the implemented genetic algorithm has, to a degree, successfully improved and optimized a idealized grid.  Additionally, there will be the beginning and basic framework of a traffic grid simulator which will allow for the testing and optimization of future traffic systems.  Finally, this paper will suggest improvements that future work could make to this study for a more successful configuration optimization.
+
+\section{Thesis Outline}\label{sec:outline}
+Chapter \ref{ch:relatedwork} reviews a number of past works in traffic control optimization and addresses their strengths and weaknesses.  It also covers basic information on genetic algorithms.  Chapter \ref{ch:method} outlines the method of approach used to establish the
+results including details on the simulator and ECJ configuration.  This chapter also discusses threats to validity and details pertaining to the techniques used for testing.  Chapter \ref{ch:implem} contains details as to the results of testing and draws conclusions based on those results.  Chapter \ref{ch:conclusion} discusses the possibility of future work and reviews some of the different aspects covered in this project.

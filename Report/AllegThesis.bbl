@@ -1,0 +1,71 @@
+\begin{thebibliography}{10}
+
+\bibitem{V2I}
+Minal~K. Avzekar and Amruta Moon.
+\newblock Scats: The sydney co-ordinated adaptive traffic system-principles,
+  methodology, algorithms.
+\newblock pages 30--32, 2014.
+
+\bibitem{biGA}
+Halim Ceylan and Michael~G.H Bell.
+\newblock Traffic signal timing optimisation based on genetic algorithm
+  approach, including drivers’ routing.
+\newblock {\em Transportation Research Part B: Methodological}, 38(4):329 --
+  342, 2004.
+
+\bibitem{gdpLoss}
+Eric Dumbugh.
+\newblock Rethinking the economics of traffic congestion.
+\newblock 2012.
+\newblock
+  \url{http://www.theatlanticcities.com/commute/2012/06/defense-congestion/2118/}.
+  Accessed 7 May 2014.
+
+\bibitem{V2V}
+Michel Ferreira, Ricardo Fernandes, Hugo Concei\c{c}\~{a}o, Wantanee
+  Viriyasitavat, and Ozan~K. Tonguz.
+\newblock Self-organized traffic control.
+\newblock In {\em Proceedings of the Seventh ACM International Workshop on
+  VehiculAr InterNETworking}, VANET '10, pages 85--90, New York, NY, USA, 2010.
+  ACM.
+
+\bibitem{GAMANUAL}
+Sean Luke.
+\newblock {\em The ECJ Owner’s Manual}.
+\newblock George Mason University, 2013.
+
+\bibitem{otherBook}
+Sean Luke.
+\newblock {\em Essentials of Metaheuristics}.
+\newblock Lulu, second edition, 2013.
+\newblock Available for free at
+  http://cs.gmu.edu/$\sim$sean/book/metaheuristics/.
+
+\bibitem{CRL}
+As'ad Salkham, Raymond Cunningham, Anurag Garg, and Vinny Cahill.
+\newblock A collaborative reinforcement learning approach to urban traffic
+  control optimization.
+\newblock In {\em Proceedings of the 2008 IEEE/WIC/ACM International Conference
+  on Web Intelligence and Intelligent Agent Technology - Volume 02}, WI-IAT
+  '08, pages 560--566, Washington, DC, USA, 2008. IEEE Computer Society.
+
+\bibitem{SCATS}
+Dobinson~K.W. Sims, A.G.
+\newblock The sydney coordinated adaptive traffic (scat) system: Philosophy and
+  benefits.
+\newblock pages 29--35, 1980.
+
+\bibitem{moGA}
+Siran~Tao Yan~Li, Lijie~Yu and Kuanmin Chen.
+\newblock Multi-objective optimization of traffic signal timing for
+  oversaturated intersection.
+\newblock In {\em Mathematical Problems in Engineering}, volume 2013, page~9,
+  1999.
+
+\bibitem{CORISM}
+Ilsoo Yun and Byungkyu~"Brian" Park.
+\newblock Application of stochastic optimization method for an urban corridor.
+\newblock In {\em Proceedings of the 38th Conference on Winter Simulation}, WSC
+  '06, pages 1493--1499. Winter Simulation Conference, 2006.
+
+\end{thebibliography}

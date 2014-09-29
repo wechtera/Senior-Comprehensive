@@ -1,0 +1,33 @@
+\contentsline {chapter}{List of Figures}{vii}
+\contentsline {chapter}{\numberline {1}Introduction}{1}
+\contentsline {section}{\numberline {1.1}Motivation}{1}
+\contentsline {section}{\numberline {1.2}Thesis Statement}{3}
+\contentsline {section}{\numberline {1.3}Goals of the Project}{3}
+\contentsline {section}{\numberline {1.4}Contributions}{4}
+\contentsline {section}{\numberline {1.5}Thesis Outline}{5}
+\contentsline {chapter}{\numberline {2}Related Work}{6}
+\contentsline {section}{\numberline {2.1}Secondary Sources}{6}
+\contentsline {subsection}{\numberline {2.1.1}SCATS}{6}
+\contentsline {subsection}{\numberline {2.1.2}Vehicle-to-Vehicle}{8}
+\contentsline {subsection}{\numberline {2.1.3}Vehicle-to-Infrastructure}{10}
+\contentsline {subsection}{\numberline {2.1.4}Reinforced-Learning}{11}
+\contentsline {section}{\numberline {2.2}Primary Sources}{12}
+\contentsline {chapter}{\numberline {3}Method of Approach}{15}
+\contentsline {section}{\numberline {3.1}Test Environment}{15}
+\contentsline {subsection}{\numberline {3.1.1}Simulator}{16}
+\contentsline {subsection}{\numberline {3.1.2}Java-based Evolutionary Computation Research System (ECJ)}{27}
+\contentsline {section}{\numberline {3.2}Threats to Validity}{31}
+\contentsline {chapter}{\numberline {4}Implementation}{35}
+\contentsline {chapter}{\numberline {5}Discussion and Future Work}{42}
+\contentsline {section}{\numberline {5.1}Summary of Results}{42}
+\contentsline {section}{\numberline {5.2}Future Work}{43}
+\contentsline {section}{\numberline {5.3}Conclusion}{44}
+\contentsline {chapter}{\numberline {A}Project Code}{46}
+\contentsline {section}{\numberline {A.1}Simulator}{46}
+\contentsline {subsection}{\numberline {A.1.1}Core}{46}
+\contentsline {subsection}{\numberline {A.1.2}Input/Output}{79}
+\contentsline {subsection}{\numberline {A.1.3}Utilities}{88}
+\contentsline {subsection}{\numberline {A.1.4}Support Files}{126}
+\contentsline {section}{\numberline {A.2}ECJ Optimizer}{159}
+\contentsline {section}{\numberline {A.3}Support Programs}{165}
+\contentsline {chapter}{Bibliography}{176}

@@ -1,0 +1,182 @@
+%
+% $Id: ch03_thework.tex
+%
+%   *******************************************************************
+%   * SEE THE MAIN FILE "AllegThesis.tex" FOR MORE INFORMATION.       *
+%   *******************************************************************
+% Fitness 153
+\chapter{Method of Approach} \label{ch:method}
+This chapter will discuss and present an overview of the programs used for this study.  It includes a detailed summary of the discrete event simulator, as well as descriptions of the ECJ tool used including parameter configurations.  It will also remark on details on the logic of why certain algorithms were used for different mechanisms as well as architectural decisions of the program.
+
+\section{Test Environment}
+
+This project has two major sub-projects comprising the performance testing environment, the simulator and the ECJ evolutionary algorithm suite.  The simulator has the sole purpose of receiving configurations of the light system, running a simulation based on a pre-determined traffic map, and evaluating the performance of an iteration and generating a correlating fitness value.  The ECJ package is in charge of the optimization of the overall system; it utilizes the fitness values to best judge which configurations are superior.
+
+\subsection{Simulator}
+%%%%%%%%%%  AROUND 585 FEET PER BLOCK!!!!!!!!!!
+%%%%%%%%%%  Comment on accuracy vs continuous 
+To begin with, this simulator is a discrete event simulator which takes four files and three ``modifier values'' as arguments and returns a fitness value based on several outcomes of this system, namely total time spent not moving at lights (time delay), total transit time, and approximate fuel used to travel through the system.  The simulator is an idealized environment in which accidents do not happen and cars react promptly to external environmental changes.  For example the cars react immediately to changes in traffic light color.  Furthermore, the entire system is within a perfect square grid; each road has the same length and the same speed limit.  Lastly, in this idealized system each road has two lanes, one in each direction.  This places constraints on cars being able to turn left if traffic flow is heavy.  The cars, as mentioned earlier, are relatively simplistic and all act the same way within the system.  Though variations of the different cars' rates of fuel consumption are possible, that option is not utilized.  The simplicity of this system is a result of time constraints and scale of scope; had more time and computing power been allocated, layers of complexity could have been introduced for better approximations of distances, staggered introductions of cars into the system, and non-grid patterned traffic maps.
+
+As is, the simulator works in a way that mimics traffic rules and etiquette and uses seconds to mark the passing events.  Since this system is a discrete event simulation, using seconds to mark the passage of time allows for comparisons to be made in an accurate manner and allows easy access to the state of the system at any point that an action is performed.  Cars enter the system at the same time at the very beginning of the simulation, and after the specialized first move, which differs from all following actions for reasons explained later, the event lists are iterated through.   The car within the event then makes a decision regarding its movement then returns to the next list if it has not reached its final destination.  Following each iteration of car events, an iteration of node events is executed to update intersection states.  Time in the system is held in the individual cars as well as  in the nodes, allowing for easy manipulation of the state of the vehicle or the intersection lights.   This is because after a while, each intersection is on its own schedule.  The pseudocode shown in \ref{Traffic Simulator} is the basic process that the simulation follows by individually going through the car events and returning the events to the queue until each car reaches its destination and is removed from the queue.  Note that after the queue of cars is looped through, there is a secondary cleaning loop which resets the state of the car so that it can go again in the next rotation.
+
+\begin{algorithm}[h]
+ \SetAlgoLined
+ \KwIn{Queue $CE \Longleftarrow Cars$}
+ \KwIn{Queue $NE \Longleftarrow Nodes$}
+ \KwResult{Fitness of intersection configuration} 
+ \While{$CE$ not empty}{
+  \For{$ce\in CE$}{
+   \If{$c \in ce$ \emph{canGo}}{
+    \eIf{$c$ at\_Destination}{
+     remove from system\;
+    }{
+     \eIf{can\_it\_move} {
+      try to move\;
+      }{
+      increment time values\;
+     }
+    }
+   }
+    {add $ce$ to $CE$\;}
+  }
+  \For{$ce\in CE$}{
+   set \emph{canGo} true\;
+  }
+  \For{$ne \in NE$}{
+   check\_and\_transition lights;
+  }
+ }
+ \caption{Algorithm describing simulation process}
+ \label{Traffic Simulator}
+\end{algorithm}
+
+Starting at the beginning, there are three files that are not reliant on the ECJ engine, unlike the configuration file.  These three files are the \texttt{node.txt} file, \texttt{edge.txt} file, and the \texttt{car.txt} file, which are comma-separated values to hold details about other aspects of the simulator.  The \texttt{node.txt} file contains information about the different nodes in the system.  The nodes are the heart of the simulator and at any given point, every ``car'' object in the system will be in one.  Nodes represent both intersections and roads connecting these intersections.  The \texttt{node.txt} file first supplies the overall dimensions of the grid, as well as the length of the roads in the grid, in feet.  The following lines of information provide the primary node data including whether the node is an intersection, in boolean format; the node ID, in form of \texttt{IorRxRowxColumn}, where the first value indicates whether it is a road or intersection while the other values represent a coordinate;  speed limit, in miles per hour; and an indicator as to intersection vs road, including type of road.  These final two merit further detail to describe what logic is used in the decision of their final forms.  The speed limit is an important aspect to measure time within the roads, however all intersections have a speed limit of 0 miles per hour.  This is because a car's location in the intersection is determined solely by other cars in the intersection and since real world intersections are often inconsistent in speed.  The final aspect of the nodes worth noting is the labeling of roads and intersections.  In order to easily determine lanes and the appropriate queues that cars enter when changing nodes, using the labels ``Lateral Roads'' and ``Vertical Roads'' made it significantly simpler than checking parts of the node IDs each time.  
+
+The second file used was the \texttt{edge.txt}, which simply represents the connections that are drawn between the different nodes.  The file lists each connection once; however, when the information is brought into the system, the connections are doubled so that there is a link from node a to node b and vice versa.  These are primarily used when the cars decide directions.  After accessing these two files, the simulator can build a grid in which cars will be added.  Nodes are outfitted with directed queues to imitate cars moving in lanes.  These directed queues act as lanes; for example, North directional queues have cars moving from South to North.  While intersections have all four of these, the roads have only the two associated with their orientation, where lateral roads have the East and West queues and vertical roads have North and South queues.  Following the construction of the map, cars are added to the system.  The \texttt{car.txt} file contains first, the node ID of the car's starting position, as well as the node ID of the car's destination.  It is important to note that cars cannot start and end at the same node as that would lead to an infinite fitness value since the time of transit would be divided by a distance of zero.  The start and destination nodes are followed by the green-house gas emissions numbers, which are available on EPA's website.  This number, while available, is not utilized in this study; it is directly correlated to time within the system.  The next input data source is the cars' IDs, which are used primarily for debugging and quality control checks.  The final information is the cars' fuel consumption, in miles per gallon.  All of the variables that describe characteristics of the cars are used solely for calculation of the system's fitness after the simulation.
+
+The final file that is used during the initiation process is the intersection configuration file.  This is read in from a comma-separated file format and is such that each line is a new intersection.  The intersections' configurations are in order and after the values are read in, the simulator iterates through the nodes and assigns each intersection the set-up determined by the ECJ engine.  All values of these chains are in binary, and the first digit indicates whether the intersection has a light or stop signs at the corners.  If the first value is a $0$, then the intersection has stop signs and the following 7 bits are of no consequence to the activity and behavior of the node.  However if the first value is a $1$, then there is a light at the intersection and the next three bits indicate the length of the North- South direction green light time.  If the decimal value of this number is $0$, then that light direction is automatically assigned the green light duration time of 15 seconds.  If it is not $0$, then the binary number is then multiplied by 15 seconds and is added to the initial 15 seconds value that is associated with a $0$ value.  The following three bits are also associated with the green light time, however, they refer to the East-West directional light.  The same rules as mentioned before apply to this value.  The final bit is used to indicate which direction has a green first, specifically, the North-South direction, indicated as true by a $1$ and false otherwise.
+
+Once all of these outside values have been entered into the system, the car objects generate directions from their start nodes to their destination nodes.  This directions generation is provided by a breadth-first search algorithm which aims to create the route with the shortest path, regardless of the speed limit or any other factors besides distance.  Once this is done, the system is ready to begin and the cars are all individually loaded into separate car events and the nodes into the node events.  The first iteration of all of these events is more of a preliminary phase where cars are actually placed in the appropriate queues and the lights can begin rotating.  All cars immediately jump from their start nodes to their second nodes so there will be no problems in the future with directional queue decisions.  Additionally the internal car time variables are incremented as they normally would be.  The decision making behind updating which directional queue that a car belongs in requires the knowledge of the previous node. While this could have been randomly assigned for the first iteration,  some minor difficulties were averted by jump starting the system.  Once this happens, the car events are executed as they would normally be.  The first rotation for node events acts as it will for the rest of the simulation, incrementing the time variable as normal.
+
+The car events execute in a simple way outlined by the pseudo code below.  It begins by checking if the car is in the system, and if it is, the simulator checks immediately if it is at its destination.  If the car proves to be at its destination, it is removed from the system and the details of the car's trip are recorded into the record data structures so they can be recalled later for calculation of the fitness value.  If the car is not at its destination, then it decides how to proceed, whether decisions should be made as if it is on a road, at an intersection that has a light, or an intersection that has a stop sign.  The simulator uses the time after the car leaves the system to do some cleaning of the queues to ensure no null values are displacing the lists, then replaces the car event back in the simulator to repeat these steps.  If the car is flagged as not being in the system, it will be removed from the list of car events thus reducing the size of the list until it is empty, marking the termination of the simulation.
+
+\begin{algorithm}[h]
+ \SetAlgoLined
+ \KwIn{Car Event $CE$}
+ \KwResult{Simulator with additional Car Event}
+    \If{Car is in system}{
+      \If{car at\_destination}{
+       Exit system\;
+      }
+      \ElseIf{Car is\_on\_road}{
+       Do road operations\;
+      }{
+      \If{Car is\_at\_light\_intersection}{
+       Do light operations\;
+      }{
+       Do sign updates\;
+      }
+     }
+     Re-queue car event to simulator\; 
+    }{
+    Do nothing, do not re-queue\;
+    }
+  \caption{Algorithm describes car event logic}
+\label{Car Event}
+\end{algorithm}
+
+Light intersections and stop sign intersections work in different ways, one requiring information from the node, the other requiring information solely from the other queues at the intersection and the cars at the front of these ``lanes''.  The intersection this paper will review is the light intersection and is demonstrated in \ref{Light Intersection}.  The first principle is that lights have three states: green, red, or transition.  These first two are rather self-explanatory, where cars can go on green and must stop on red.  The transition period follows only after a green light and provides the opportunity for cars which wish to turn left, but did not have the opportunity during its green light because of traffic, to make that turn.  When a car arrives at the intersection, the first step it takes is to check whether or not it is allowed to move.  This is because in a situation where two cars at a green light, \texttt{car a} and \texttt{car b} where \texttt{car a} is at the front of the queue and \texttt{car b} is behind, if \texttt{car a} event is selected first and makes its movement into the next road. When \texttt{car b} is selected to make its decision and the car object decides to make a move because it is at the front of the queue and the light is green, there would be a conflict because two actions would be performed at the same time which in reality would cause a collision.  To prevent this conflict, each car has a boolean \texttt{can go} variable.  After confirming that the selected car is available for movement, the car checks the light signal and its logic branches.  If the appropriate directional lights are green, one of three possibilities will occur.  If the car is not at the front of the queue it will make no movement.  If it is at the front of the queue, it will proceed straight or right if either is its direction, or it will first check the oncoming lane and proceed left only if that queue is empty.  If the light is in a transition period, only if a car is at the front of the queue will it have the option of moving. If that lead car has a left turn to make, that left is given priority. If the lead car has a right turn, it will make it on the condition that the other lane across from it is empty.  After movement decisions are made, it is important to note that all of the other cars that are in the queue are immediately flagged as not allowed to go.
+
+\begin{algorithm}
+ \SetAlgoLined
+ \KwData{Car $C$}
+ \Begin{
+  \If{Car can\_go}{
+   \If{Light is\_green}{
+    \eIf{Car not\_at\_front\_of\_queue}{
+     Do nothing\;
+    }{
+     \eIf{Car going\_straight\_or\_right}{
+      Update car info\;
+     }{
+      \eIf{Opposite queue is empty}{
+       Update car info\;
+      }{Do nothing\;}
+     }
+    }
+   }                
+  \ElseIf{Light is\_transition}{
+   \eIf{Car moving\_left}{
+    Update car info\;
+   }{
+    \eIf{Opposite lane Is\_empty}{
+     Update car info\;
+    }{Do nothing\;}
+   }
+  }
+  \Else{Do Nothing\;}
+  }
+ }
+ \caption{Algorithm describes light intersection logic}
+\label{Light Intersection}
+\end{algorithm}
+
+\newpage
+Sign intersections are slightly more complicated logically since in reality, various factors will often lead to behaviors that differ from that strictly dictated by law.  The simulation breaks down the intersection in a way that closely mimics the way an intersection of stop signs would work.  The premise of the stop sign is that a car must come to a complete stop, and if it is not there first, must yield to any oncoming or conflicting traffic.  This operation begins in the same way as the light intersection, with checks to see if the car is legally able to move or not and to see if the car is in the front of the queue.  If both are true, then after setting the rest of the cars in the queue to not being able to move, the car checks to see how long it has been at the front of the queue and compares that time to the lead cars in different lanes at the intersection.  If the time is the longest, or if that time exceeds four seconds, then that car is allowed to move on with priority over the others.  The reason the four-second rule is applied is that if the car has been there for four seconds, all other cars around the intersection have been rotated through so no matter what, this car must be next to move.  Primarily this rule is used to save time in calculating the times of the other cars around the intersection.  If several cars are there and several have the same time at front stamps, then a random roll is done to decide whether or not the car in question is to go first.  If it can move first, then it is automatically allowed to move, and all other cars at the front of their lanes must wait unless their move does not conflict with the car-in-question's movement.  If that is the case, rather than updating the other non-conflicting cars'  ``can go?" flag to false, it is ignored so that it can go during its turn while the others are flagged.  This process can get rather complicated when more lanes have cars but the general premise is that longest there goes first.
+
+\begin{algorithm}[htpb]
+ \SetAlgoLined
+ \KwData{Car $C$}
+ \Begin{ 
+  \eIf{Car Can\_go}{
+   Get List: thereLongest\;
+   \eIf{c there\_longest}{
+    \If{thereLongest > 1}{
+     \eIf{Roll to go == true}{
+       Update car info\;
+       check for any non conflicting\;
+       set rest to no\_go\;
+     }{Do nothing\;}
+    }
+   }{Do nothing\;}
+  }{Do nothing\;}
+ }
+
+ \caption{Car sign intersection logic}
+\label{Stop Sign Intersection}
+\end{algorithm}
+
+Although it has been mentioned several times, how cars are able to update and what happens when the car is determined to do nothing has not yet been thoroughly explained.  These two operations are relatively simple, however, involving primarily incrementation of different timers, updating location information, and cleaning any information from the current car event operations.  Starting with the \texttt{doNothing} operation, the primary goal is to increment all timers.  This includes updating the time it has been at the front if it is already there, the time in its current node/queue, updating its total time in the system, and finally, if it is waiting to move through an intersection, then incrementing the delay timer as well.  The \texttt{updateCar} method is slightly more intricate primarily because when a car's info is updated, it is moving from one node to the next node in its directions list.  This process calls methods to first, set the previous node to the node it is currently in, then set the current node to the node that is considered next at the time, and finally to update its next node, which pulls from the direction list to actually increment through the directions assigned at its instantiation.  In addition to these important updates, information such as time in the current queue/node and time at the front of the current queue/node are cleared for the upcoming node.  Finally information that is not related to being in any particular node or queue is also updated and incremented.
+
+Node events are far more simple than the car events.  The only actions that must be done in a node is either simply the incrementation of an internal node timer, which exists to keep track of when light patterns will change, or the actual change of light states.  Both of these are handled within the event and the only necessary explanation is that when the green time of a direction reaches the time dictated by the configuration file, the state is changed to the transition state.  Once in this state, it will wait one second in the simulation time, or a time that is specified by the source code pre-compilation, before switching.  Finally it will then switch to the red light state and repeat the process.  Unlike the car events, these events are never removed from the system and each node is updated every internal tick of the simulator.
+
+The final aspect of this simulator that bears discussion is the fitness function.  The fitness function is one that is tuned to find the fitness according to multiple objectives, chiefly reducing the time a car spends in the system.  To weigh all of these values properly, the simulator takes the distance that they traveled and divides the time variables by it.  When a car exits the system, the car's delay time, total time, and gas consumption is recorded into a list.  The list is then iterated through and each car gets each of those numbers, divided by that car's total distance travelled, then subtracted from the existing fitness.  The reason that the system subtracts these values from the fitness is that the optimizer strives to maximize the fitness value up to and including infinity and negative infinity.  Due to this behavior characteristic, since all recorded values are technically values that are unwanted, it is easier to flip the sign to ``maximize" this function than to minimize these values.  This value is in the form of a float because ECJ requires a float while evaluating genomes, as a fitness.
+
+\subsection{Java-based Evolutionary Computation Research System (ECJ)}
+
+The Java-based Evolutionary Computation Research System, or ECJ system, is a java written, run-time determined system focussed on evolutionary algorithms.  Using parameter files, this system allows problems to be solved that the users design, through a number of different algorithms, though for this study, only a genetic algorithm was used based around the simple generational evolutionary algorithm.  The basis of this algorithm is from the \texttt{SimpleEvolutionState} which defines the the actual process that is used while solving the problem.  ECJ requires users to define a parameters file, an evaluate method for the problem, and a problem.  In this situation, the problem was the simulator so after defining the other aspects of the ECJ engine, an ECJ plug was developed that allowed interaction between the the evaluate method and the remainder of the problem.\cite{GAMANUAL}   
+
+As shown in \ref{javaprog}, the configuration for this process is relatively simple and did not take much work other than creating the appropriate parameters file.  When the main function is called within Evolve, ECJ requires that a parameters file be provided to supply the necessary information that is needed to call the correct classes and provide the necessary information as a global variable file.  The config file below is the one that is primarily used throughout the study, besides a few variations explained in the experimental section.  The first two parameters are mundane and influence how quickly the program can run by increasing the thread count.  For this system, it was opted to use only a single thread for each to lower system requirements and since time of the operation was not as imperative.  Following this, the seed number is identified.  This number is very important because it allows trials to be reproduced time after time because this number controls all random number generation, including genome generation, mutation, and crossover.  Following this, the configuration file labels this as a SimpleEvolutionState problem which, as mentioned before, means it is a simple generational problem.  Other class parameters, primarily the selection and breeding aspects, determine it to work as a genetic algorithm when the simple class is chosen.  Following the class parameter configurations are the genetic algorithm configurations, including what type of genome is used, generation numbers, and population sizes.  The final most important aspect of this parameters file is the output file, which records the output and statistics of the run.  This is saved to a \texttt{.stat} file, and contains, for each generation, the individual with the highest fitness, and the genome of that individual.
+
+\begin{figure}[htbp]
+\centering
+\lstinputlisting{trafficSim.params}
+\caption{{\tt TrafficSim.params}: The baseline parameters file used for this study}
+\label{javaprog}
+\end{figure}
+
+The final aspect of the ECJ that should be discussed is the evaluate method.  This method is what the ECJ engine references as the problem and is responsible for ensuring the genomes are valid, and sending those genomes into the simulator to be evaluated.  Genomes of individuals are bit vectors and are randomly created by the ECJ engine, using that random seed mentioned before.  The size is determined by the number of intersections within the map, so a map with 25 intersections would be 200 bits long.  This method splits the genome into a form that can be used, as explained earlier, by the simulator in the CSV format needed.  After it is converted, it is written to the timings file and sent to the simulator which creates, runs, and evaluates the current configuration.  The individual is then assigned its fitness as a float, and then returned to the ECJ system.  
+
+As a reminder, this study is geared towards discovering whether or not genetic algorithms can be used to optimize traffic configurations in a larger traffic grid than some of the previous studies.  To do this, the ECJ system was utilized and configured in a way that would use a genetic algorithm to generate traffic signal configurations for the grid, then use the simulator to evaluate these configurations, and finally return to the ECJ system to complete the optimization process.  This study then used a series of trials to confirm whether this worked or not by comparing the initial randomly generated fitness to the final fitness of the program.  If the fitness value was greater than it was at the start, then it successfully optimized it.  After a few preliminary trials, it appeared that the program optimized the systems every time, however the matter of degree came into question.  To discover this, several performance tests were set up and ran, followed by analysis and an in depth review of how this could possibly be so.  The parameters this study focus on manipulating are  crossover probability, mutation probability, and finally the modifiers or weights of the variables of the fitness function.  These are all self-explanatory besides the modifiers.  The modifiers variable is used to give weights to the three different fitness inputs, with one parameter giving weight to each one, and one giving an equal weight to all three.  Each of these parameters were exhaustively studied and for each trial, a total of 30 different random seeds were used.  These seeds were randomly generated before performance testing and the same seeds were used throughout experimentation.  
+
+To test these parameters, the evaluate method and parameter file had to be changed for each configuration.  To do this a program was written that generated each of the necessary files using loops to substitute the necessary values in, such as mutation rate, parameter file name, and other variables that changed per trial.  The java file took the text from the actual files that would not be changed in strings, and appended them together in a way to create a new trial.  These experiments each have an individual value and more importantly an output file where the results were recorded.  This was deemed the easiest method to approach performance testing compared to one of the built in systems that allowed ECJ to run multiple jobs with multiple configurations in a set called jobs.  These generation programs also produced index files which kept track of parameters used for each run in the form of comma separated format.  These index files are important for the later analysis of the results.  Additionally, to run all of these different configurations, a bash script was generated to simply run each individual trial.  This script simply was an exhaustive list of all the trials generated and was, once again generated in a java program beforehand.  The final aspect that was used in the preparation and experimentation phase of this process was the program which stripped all of the output files, index files, and other important details, compiling them into a single statistical analysis file.  This file was in comma separated format and would later be used in analysis of the results.
+
+\section{Threats to Validity}
+
+There are several parts of this project which could influence the validity of this study including the accuracy of several aspects, the random generation, and other logical choices made when designing this project.  The most important idea was to make an accurate simulator however, an idealized system is not a very accurate simulation of the real world.  Some of the aspects that call validity into question are how cars are introduced to the system, how the cars exit the system, how they drive on the roads, and finally the basic layout of the system.  The cars all enter into the system at the same time as mentioned earlier.  This is not realistic in the least and affects movement a bit since the queues are flooded and cars all have the same starting time when they arrive initially in their queues.  A better approach, which is slightly more complex, would involve cars being introduced sporadically throughout the duration of the simulation.  This would have the trade off of taking longer to run and if too large of a system were used, it may take significantly longer, though speed was not the goal of this project.  The next possible problem with this project involves how the cars exit the system.  Currently, a car is pulled from the system as soon as it reaches its destination node, without regard to its more specific destination within the node, and hence, without regard to such possible time-consuming tasks as parking.  This treatment of exiting a system is deemed imperative, however, to remain within the scope of the project due to time constraints.  The next important aspect which could be improved on in future projects is the manner in which cars move down a road.  The current system has the cars moving both regularly, and reacting immediately to changes in the environment.  This is also not realistic, especially in modern traffic systems, where there is so much news of texting and other distractions influencing how cars drive.  Additionally, drivers personalities can greatly influence the way events on the road occur.  For example, more aggressive drivers are likely to take the initiative at a stop sign intersection while student drivers are likely to be hesitant in their behaviors on the road.  All of these factors contribute to less realism because the cars objects acting extremely mechanical and logically.  
+
+Yet another problem that merits attention is one of the fundamental behaviors of the intersections.  The simulator has the ability to check, at a stop sign intersection with multiple cars, each of the other car's intentions and use that knowledge to allow other cars to move, in addition to ensuring other cars have not been there longer than the current car.  Light intersections have a similar knowledge and this can be slightly less realistic than needed.  While knowledge is conveyed in the real world, there are always chances that cars will forget to signal or inform the others around it of its intentions.  The final important element to discuss about problems with is the idealized traffic grid.  There are extremely few towns or cities which have perfect grids, where roads are identical and intersections have 4 roads each.  This threatens validity by showing that even if there were a trend of genetic algorithms being able to optimize a system such as the one proposed, more complex intersections and city plans could be too complex for the optimizer to solve.
+
+Another threat to validity stems from the performance testing of the system and how different aspects were chosen.  The biggest example is how cars were chosen and generated to fill the system.  For the trials in the experiments, cars were randomly generated and had completely random starting points and locations.  While this could be applicable to real life, as on any given day a different number of cars can be found on the road from different locations with different destinations, this is not always the case.  Cities are designed in a way that holds majority of public housing and starting points are in some areas, and destinations at other points.  That is to say that city planning often has a method behind designing where major traffic veins will be.  By introducing randomness to starting points and destinations, there is a higher chance that there will be a wider, even coverage across the map for both starting and destination locations.  In a smaller system, it would be more ideal to choose these starting and stopping destinations, saying a higher percentage of cars would start in \texttt{area A} than \texttt{area B}, as well as destination spots, however with the larger trials, this is too time consuming.
+
+The final point worth mentioning is the choice of direction choosing algorithms.  For the trials run in experiments, the simulator used a breadth-first search, shortest path algorithm.  This algorithm paid no attention to speed limits or any other factors besides how many nodes that the car would pass through since nodes are associated with distance.  The reason this algorithm was feasible to use is that all roads in the trials have the same speed limit thus are evenly weighted, while in real world circumstances, this would not be the case.  In a city plan where speed limits were more relative and varied from road to road, a different algorithm for determining car pathing would be more applicable such as Djikstra's algorithm, which is an algorithm or finding the shortest path through a graph with weighted edges, in this circumstance extending to the speed limits of roads.  

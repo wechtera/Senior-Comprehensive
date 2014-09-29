@@ -1,0 +1,18 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Block diagram of adaptive traffic system equipped with VANET}}{11}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Algorithm describing simulation process}}{17}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Algorithm describes car event logic}}{21}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Algorithm describes light intersection logic}}{23}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Car sign intersection logic}}{25}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces {\tt TrafficSim.params}: The baseline parameters file used for this study}}{29}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Equally weighted variables, 0.0 crossover rate fitness comparisons}}{36}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Percent change between starting fitnesses and final fitnesses}}{37}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Time delay heavily weighted (.6 vs .3), 0.2 crossover rate fitness comparisons}}{38}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Percent change between starting fitnesses and final fitnesses}}{39}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Fuel consumption heavily weighted (.6 vs .3), 0.6 crossover rate}}{40}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Percent change between starting fitnesses and final fitnesses}}{41}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
